@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fatigue Severity Assessment | Cytokind</title>
+  <meta name="description" content="Take the clinically validated Fatigue Severity Scale (FSS) and see how your fatigue compares to MS patients worldwide.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:        #121b51;
+      --magenta:     #d01b9c;
+      --magenta-dk:  #a8167a;
+      --cyan:        #009dff;
+      --purple-dark: #241133;
+      --white:       #ffffff;
+      --gray-light:  #f5f7fa;
+      --gray-border: rgba(18, 27, 81, 0.15);
+      --text-muted:  rgba(18, 27, 81, 0.55);
+      --radius-pill: 50px;
+      --radius-card: 16px;
+      --shadow-card: 0 4px 24px rgba(18, 27, 81, 0.08);
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Noto Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--gray-light);
+      color: var(--navy);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ─── Header ────────────────────────────────────────────── */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--navy);
+      padding: 0 24px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wordmark {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .wordmark span {
+      color: var(--magenta);
+    }
+
+    /* ─── Layout ─────────────────────────────────────────────── */
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    /* ─── Screen Management ──────────────────────────────────── */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ─── Cards ──────────────────────────────────────────────── */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card);
+      padding: 36px 32px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 28px 20px; }
+      .container { padding: 20px 16px 60px; }
+    }
+
+    /* ─── Typography ─────────────────────────────────────────── */
+    .eyebrow {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--magenta);
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      color: var(--navy);
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      font-size: clamp(1.4rem, 4vw, 1.9rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      color: var(--navy);
+      margin-bottom: 14px;
+    }
+
+    h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 16px;
+    }
+
+    p {
+      font-size: 1rem;
+      line-height: 1.65;
+      color: var(--navy);
+      margin-bottom: 16px;
+    }
+
+    p:last-child { margin-bottom: 0; }
+
+    .text-muted {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    /* ─── Buttons ─────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: var(--radius-pill);
+      padding: 14px 36px;
+      font-family: 'Noto Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+      transition: background 0.2s ease, color 0.2s ease, transform 0.1s ease, opacity 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn:active { transform: scale(0.98); }
+
+    .btn-primary {
+      background: var(--magenta);
+      color: var(--white);
+    }
+
+    .btn-primary:hover { background: var(--magenta-dk); }
+
+    .btn-primary:disabled {
+      background: rgba(18, 27, 81, 0.15);
+      color: rgba(18, 27, 81, 0.35);
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--navy);
+      border: 2px solid var(--gray-border);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--navy);
+      background: var(--navy);
+      color: var(--white);
+    }
+
+    .btn-link {
+      background: transparent;
+      color: var(--text-muted);
+      padding: 10px 20px;
+      font-size: 0.875rem;
+      font-weight: 400;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .btn-link:hover { color: var(--navy); }
+
+    .btn-block {
+      width: 100%;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    /* ─── Progress Bar ───────────────────────────────────────── */
+    .progress-wrap {
+      margin-bottom: 28px;
+    }
+
+    .progress-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .progress-track {
+      height: 6px;
+      background: rgba(18, 27, 81, 0.1);
+      border-radius: 50px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--magenta);
+      border-radius: 50px;
+      transition: width 0.3s ease;
+      width: 0%;
+    }
+
+    /* ─── Scale Legend ───────────────────────────────────────── */
+    .scale-legend {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 24px;
+      padding: 0 2px;
+    }
+
+    /* ─── Question Blocks ────────────────────────────────────── */
+    .question-block {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--gray-border);
+    }
+
+    .question-block:last-of-type { border-bottom: none; }
+
+    .question-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .q-num {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--magenta);
+      color: var(--white);
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+    }
+
+    .q-text {
+      font-size: 0.975rem;
+      font-weight: 600;
+      color: var(--navy);
+      line-height: 1.4;
+    }
+
+    /* ─── Rating Scale (pill toggles) ───────────────────────── */
+    .rating-group {
+      display: flex;
+      gap: 7px;
+      flex-wrap: nowrap;
+    }
+
+    .rating-option { cursor: pointer; }
+
+    .rating-option input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .rating-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 2px solid rgba(18, 27, 81, 0.2);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--navy);
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .rating-option:hover .rating-btn {
+      border-color: var(--magenta);
+      color: var(--magenta);
+    }
+
+    .rating-option input:checked + .rating-btn {
+      background: var(--magenta);
+      border-color: var(--magenta);
+      color: var(--white);
+    }
+
+    @media (max-width: 380px) {
+      .rating-btn { width: 36px; height: 36px; font-size: 0.8rem; }
+      .rating-group { gap: 5px; }
+    }
+
+    /* ─── Score Display ──────────────────────────────────────── */
+    .score-display {
+      text-align: center;
+      padding: 32px 0 24px;
+    }
+
+    .score-number {
+      font-size: clamp(4rem, 15vw, 6rem);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      color: var(--navy);
+      line-height: 1;
+      display: block;
+    }
+
+    .score-total {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-top: 6px;
+      display: block;
+    }
+
+    .score-badge {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 6px 20px;
+      border-radius: var(--radius-pill);
+      background: var(--magenta);
+      color: var(--white);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .score-badge.badge-low {
+      background: var(--cyan);
+    }
+
+    .score-desc {
+      margin-top: 16px;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ─── Chart Section ──────────────────────────────────────── */
+    .chart-section {
+      margin-top: 8px;
+    }
+
+    .chart-wrap {
+      position: relative;
+      height: 260px;
+      margin-bottom: 16px;
+    }
+
+    .chart-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px 24px;
+      justify-content: center;
+      margin-top: 12px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--navy);
+    }
+
+    .legend-swatch {
+      width: 24px;
+      height: 12px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    .legend-line {
+      width: 24px;
+      height: 3px;
+      border-top: 2.5px dashed var(--navy);
+      flex-shrink: 0;
+    }
+
+    /* ─── PhoCIS Callout ─────────────────────────────────────── */
+    .phocis-callout {
+      margin-top: 28px;
+      background: #eef3ff;
+      border-left: 4px solid var(--navy);
+      border-radius: 0 12px 12px 0;
+      padding: 20px 24px;
+    }
+
+    .phocis-callout .eyebrow {
+      color: var(--magenta);
+      margin-bottom: 8px;
+    }
+
+    .phocis-callout p {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+
+    .phocis-callout .citation {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    /* ─── Optional Form ──────────────────────────────────────── */
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+
+    .form-input,
+    .form-select {
+      width: 100%;
+      padding: 12px 22px;
+      border: 1.5px solid var(--gray-border);
+      border-radius: var(--radius-pill);
+      font-family: 'Noto Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--navy);
+      background: var(--white);
+      appearance: none;
+      -webkit-appearance: none;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23121b51' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 20px center;
+      padding-right: 44px;
+      cursor: pointer;
+    }
+
+    .form-input:focus,
+    .form-select:focus {
+      border-color: var(--magenta);
+      box-shadow: 0 0 0 3px rgba(209, 27, 156, 0.12);
+    }
+
+    .form-input::placeholder { color: rgba(18, 27, 81, 0.35); font-weight: 400; }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 420px) {
+      .form-row { grid-template-columns: 1fr; }
+    }
+
+    .privacy-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--gray-border);
+      line-height: 1.5;
+    }
+
+    /* ─── Booking Screen ─────────────────────────────────────── */
+    #screen-booking {
+      min-height: calc(100vh - 60px);
+      background: var(--purple-dark);
+      margin: 0 -20px -60px;
+      padding: 0 20px 60px;
+    }
+
+    #screen-booking .container {
+      padding-top: 60px;
+    }
+
+    .booking-card {
+      text-align: center;
+    }
+
+    .booking-card .wordmark {
+      display: inline-block;
+      margin-bottom: 36px;
+      font-size: 1.3rem;
+    }
+
+    .booking-card h2 {
+      color: var(--white);
+      font-size: clamp(1.6rem, 5vw, 2.2rem);
+      margin-bottom: 16px;
+    }
+
+    .booking-card p {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 1rem;
+      max-width: 460px;
+      margin: 0 auto 24px;
+    }
+
+    .trust-badges {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px 20px;
+      margin-bottom: 36px;
+    }
+
+    .trust-badge {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .trust-badge::before {
+      content: '✓ ';
+      color: var(--magenta);
+    }
+
+    .booking-footer {
+      margin-top: 48px;
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.3);
+      text-align: center;
+    }
+
+    .booking-footer a {
+      color: rgba(255, 255, 255, 0.4);
+      text-decoration: none;
+    }
+
+    .booking-footer a:hover { color: rgba(255, 255, 255, 0.7); }
+
+    /* ─── Divider ────────────────────────────────────────────── */
+    .divider {
+      height: 1px;
+      background: var(--gray-border);
+      margin: 28px 0;
+    }
+
+    /* ─── Intro disclaimer ───────────────────────────────────── */
+    .disclaimer {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      background: rgba(18, 27, 81, 0.04);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-top: 20px;
+    }
+
+    .disclaimer-icon {
+      font-size: 1rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .disclaimer p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    /* ─── Spinner (loading state) ────────────────────────────── */
+    .btn-loading {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ HEADER ══════════════════════════════════════════════ -->
+  <header class="site-header">
+    <a href="https://cytokind.net" class="wordmark">Cyto<span>kind</span></a>
+  </header>
+
+  <!-- ═══ SCREEN 1: INTRO ══════════════════════════════════════ -->
+  <div id="screen-intro" class="screen active">
+    <div class="container">
+      <div class="card">
+        <span class="eyebrow">MS Fatigue Assessment</span>
+        <h1>How is fatigue affecting your life?</h1>
+        <p>The <strong>Fatigue Severity Scale (FSS)</strong> is a clinically validated 9-question assessment used in multiple sclerosis research worldwide. It takes less than 2 minutes.</p>
+        <p>You'll receive your personal score and see how it compares to other patients — based on published clinical data.</p>
+
+        <div class="divider"></div>
+
+        <div style="display:flex; gap:24px; flex-wrap:wrap; margin-bottom:24px;">
+          <div style="display:flex; align-items:center; gap:8px; font-size:0.875rem; font-weight:600;">
+            <span style="color:var(--magenta); font-size:1.1rem;">○</span> 9 questions
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; font-size:0.875rem; font-weight:600;">
+            <span style="color:var(--magenta); font-size:1.1rem;">○</span> Under 2 minutes
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; font-size:0.875rem; font-weight:600;">
+            <span style="color:var(--magenta); font-size:1.1rem;">○</span> Free & confidential
+          </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="startAssessment()">
+          Start Assessment &rarr;
+        </button>
+
+        <div class="disclaimer" style="margin-top:24px;">
+          <span class="disclaimer-icon">ℹ️</span>
+          <p>This assessment is for informational purposes only and does not constitute medical advice or diagnosis. Consult your physician with any health concerns.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SCREEN 2: QUESTIONS ══════════════════════════════════ -->
+  <div id="screen-questions" class="screen">
+    <div class="container">
+      <div class="card">
+
+        <div class="progress-wrap">
+          <div class="progress-label">
+            <span>Your progress</span>
+            <span id="progress-count">0 of 9 answered</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+        </div>
+
+        <span class="eyebrow">9 Questions</span>
+        <h2>Rate each statement from 1 to 7</h2>
+
+        <div class="scale-legend">
+          <span>1 = Strongly Disagree</span>
+          <span>7 = Strongly Agree</span>
+        </div>
+
+        <div id="questions-list"></div>
+
+        <div style="margin-top:32px;">
+          <button class="btn btn-primary btn-block" id="calc-btn" onclick="calculateScore()" disabled>
+            Calculate My Score &rarr;
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SCREEN 3: RESULTS ════════════════════════════════════ -->
+  <div id="screen-results" class="screen">
+    <div class="container">
+
+      <!-- Score Card -->
+      <div class="card">
+        <span class="eyebrow">Your FSS Score</span>
+
+        <div class="score-display">
+          <span class="score-number" id="result-mean">—</span>
+          <span class="score-total" id="result-total">Total: — / 63</span>
+          <span class="score-badge" id="result-badge">—</span>
+          <p class="score-desc" id="result-desc"></p>
+        </div>
+      </div>
+
+      <!-- Chart Card -->
+      <div class="card chart-section">
+        <h3>How you compare to other patients</h3>
+        <div class="chart-wrap">
+          <canvas id="fss-chart"></canvas>
+        </div>
+        <div class="chart-legend">
+          <div class="legend-item">
+            <div class="legend-swatch" style="background:rgba(0,157,255,0.5); border: 2px solid #009dff;"></div>
+            <span>Healthy Controls</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-swatch" style="background:rgba(209,27,156,0.4); border: 2px solid #d01b9c;"></div>
+            <span>MS Patients</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-line"></div>
+            <span>Your Score</span>
+          </div>
+        </div>
+
+        <!-- PhoCIS Callout -->
+        <div class="phocis-callout">
+          <span class="eyebrow">Clinical Evidence</span>
+          <p>In the <strong>PhoCIS clinical trial</strong>, patients using narrowband UVB phototherapy showed meaningful reductions in FSS fatigue scores over 12 months — and <strong>30% did not progress to full MS</strong>, compared to 0% in the control group.</p>
+          <p class="citation">Hart PH, et al. <em>Multiple Sclerosis and Related Disorders</em>, 2018. doi:10.1016/j.msard.2018.03.013</p>
+        </div>
+      </div>
+
+      <div style="padding: 0 4px;">
+        <button class="btn btn-primary btn-block" onclick="showScreen('screen-optional')">
+          Next &rarr;
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ SCREEN 4: OPTIONAL DATA ══════════════════════════════ -->
+  <div id="screen-optional" class="screen">
+    <div class="container">
+      <div class="card">
+        <span class="eyebrow">Optional</span>
+        <h2>Help future patients like you</h2>
+        <p>We're building a database of fatigue data from people living with autoimmune conditions to better understand how phototherapy helps. Your data is kept private and used only in aggregate.</p>
+        <p style="color:var(--text-muted); font-size:0.875rem;">This is completely optional — you can skip straight to your results.</p>
+
+        <div class="divider"></div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="f-initials">Your Initials</label>
+            <input class="form-input" type="text" id="f-initials" placeholder="e.g., J.S." maxlength="5" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="f-sex">Sex</label>
+            <select class="form-select" id="f-sex">
+              <option value="">Select...</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Non-binary">Non-binary</option>
+              <option value="Prefer not to say">Prefer not to say</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="f-age">Age</label>
+            <input class="form-input" type="number" id="f-age" placeholder="e.g., 42" min="18" max="99">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="f-diagnosis">Diagnosis</label>
+            <select class="form-select" id="f-diagnosis">
+              <option value="">Select...</option>
+              <option value="Multiple Sclerosis">Multiple Sclerosis</option>
+              <option value="Long COVID">Long COVID</option>
+              <option value="Psoriasis">Psoriasis</option>
+              <option value="Eczema">Eczema</option>
+              <option value="Lupus">Lupus</option>
+              <option value="Other autoimmune">Other autoimmune condition</option>
+              <option value="Not yet diagnosed">Not yet diagnosed</option>
+            </select>
+          </div>
+        </div>
+
+        <p class="privacy-note">
+          🔒 Your responses are anonymous and never sold or shared with third parties. Initials, if provided, are used only to distinguish repeat submissions.
+        </p>
+
+        <div class="btn-row">
+          <button class="btn btn-primary btn-block" id="contribute-btn" onclick="submitAndContinue(true)">
+            Contribute &amp; Continue &rarr;
+          </button>
+          <button class="btn btn-ghost btn-block" onclick="submitAndContinue(false)">
+            Skip &rarr;
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SCREEN 5: BOOKING ═════════════════════════════════════ -->
+  <div id="screen-booking" class="screen">
+    <div class="container">
+      <div class="booking-card" style="text-align:center; padding-top:20px;">
+
+        <a href="https://cytokind.net" class="wordmark" style="display:inline-block; margin-bottom:40px; font-size:1.3rem;">Cyto<span>kind</span></a>
+
+        <div style="margin-bottom:12px;">
+          <span class="eyebrow" style="color:var(--magenta);">Take the Next Step</span>
+        </div>
+
+        <h2 style="color:var(--white); font-size:clamp(1.6rem, 5vw, 2.2rem); margin-bottom:18px; max-width:460px; margin-left:auto; margin-right:auto;">
+          Ready to learn if phototherapy is right for you?
+        </h2>
+
+        <p style="color:rgba(255,255,255,0.75); max-width:440px; margin:0 auto 28px;">
+          Our team has helped patients with MS, long COVID, and other autoimmune conditions reduce fatigue and reclaim their quality of life. A 10-minute discovery call costs you nothing.
+        </p>
+
+        <div class="trust-badges">
+          <span class="trust-badge">Free</span>
+          <span class="trust-badge">No commitment</span>
+          <span class="trust-badge">Speak directly with our team</span>
+        </div>
+
+        <a
+          href="https://calendly.com/d/crkh-wv5-vdv/10-min-discovery-call"
+          target="_blank"
+          rel="noopener"
+          class="btn btn-primary"
+          style="font-size:1rem; padding:16px 40px;"
+        >
+          Book My Free Discovery Call &rarr;
+        </a>
+
+        <div style="margin-top:20px;">
+          <button class="btn btn-link" style="color:rgba(255,255,255,0.4);" onclick="window.location.href='https://cytokind.net'">
+            Maybe later
+          </button>
+        </div>
+
+      </div>
+
+      <div class="booking-footer">
+        &copy; 2026 Cytokind &nbsp;&middot;&nbsp; <a href="https://cytokind.net">cytokind.net</a>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    // ─── CONFIG ───────────────────────────────────────────────
+    // After deploying apps-script.js to Google Apps Script,
+    // replace YOUR_APPS_SCRIPT_URL with the Web App URL.
+    const APPS_SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL';
+
+    // ─── FSS QUESTIONS ────────────────────────────────────────
+    const QUESTIONS = [
+      'My motivation is lower when I am fatigued.',
+      'Exercise brings on my fatigue.',
+      'I am easily fatigued.',
+      'Fatigue interferes with my physical functioning.',
+      'Fatigue causes frequent problems for me.',
+      'My fatigue prevents sustained physical functioning.',
+      'Fatigue interferes with carrying out certain duties and responsibilities.',
+      'Fatigue is among my three most disabling symptoms.',
+      'Fatigue interferes with my work, family, or social life.'
+    ];
+
+    // ─── STATE ────────────────────────────────────────────────
+    const responses = new Array(QUESTIONS.length).fill(null);
+    let currentMean  = null;
+    let currentTotal = null;
+    let currentLabel = null;
+    let fssChart     = null;
+
+    // ─── SCREEN MANAGEMENT ────────────────────────────────────
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      const target = document.getElementById(id);
+      target.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ─── INIT QUESTIONS ───────────────────────────────────────
+    function buildQuestions() {
+      const list = document.getElementById('questions-list');
+      list.innerHTML = '';
+      QUESTIONS.forEach((q, i) => {
+        const block = document.createElement('div');
+        block.className = 'question-block';
+        block.innerHTML = `
+          <div class="question-header">
+            <div class="q-num">${i + 1}</div>
+            <div class="q-text">${q}</div>
+          </div>
+          <div class="rating-group" id="rg-${i}">
+            ${[1,2,3,4,5,6,7].map(v => `
+              <label class="rating-option">
+                <input type="radio" name="q${i}" value="${v}" onchange="onResponse(${i}, ${v})">
+                <div class="rating-btn">${v}</div>
+              </label>
+            `).join('')}
+          </div>
+        `;
+        list.appendChild(block);
+      });
+    }
+
+    function onResponse(qi, val) {
+      responses[qi] = val;
+      const answered = responses.filter(r => r !== null).length;
+      const pct = (answered / QUESTIONS.length) * 100;
+      document.getElementById('progress-fill').style.width = pct + '%';
+      document.getElementById('progress-count').textContent = `${answered} of ${QUESTIONS.length} answered`;
+      document.getElementById('calc-btn').disabled = answered < QUESTIONS.length;
+    }
+
+    function startAssessment() {
+      buildQuestions();
+      showScreen('screen-questions');
+    }
+
+    // ─── SCORE CALCULATION ────────────────────────────────────
+    function getInterpretation(mean) {
+      if (mean < 4.0) {
+        return {
+          label: 'Below Clinical Threshold',
+          desc: 'Your fatigue score is below the clinical significance threshold. Many people without significant fatigue disorders score in this range.',
+          badgeClass: 'badge-low'
+        };
+      } else if (mean < 5.2) {
+        return {
+          label: 'Clinically Significant Fatigue',
+          desc: 'Your score indicates fatigue that is meaningfully impacting your daily life. This level is common in people with MS and other autoimmune conditions.',
+          badgeClass: ''
+        };
+      } else if (mean < 6.0) {
+        return {
+          label: 'Severe Fatigue',
+          desc: 'Your score indicates severe fatigue. Most people at this level report significant interference with work, family, and physical function.',
+          badgeClass: ''
+        };
+      } else {
+        return {
+          label: 'Very Severe Fatigue',
+          desc: 'Your score indicates very severe fatigue. This level of fatigue is among the highest reported in MS populations.',
+          badgeClass: ''
+        };
+      }
+    }
+
+    function calculateScore() {
+      const total = responses.reduce((a, b) => a + b, 0);
+      const mean  = total / QUESTIONS.length;
+      const interp = getInterpretation(mean);
+
+      currentMean  = mean;
+      currentTotal = total;
+      currentLabel = interp.label;
+
+      // Populate results screen
+      document.getElementById('result-mean').textContent  = mean.toFixed(1);
+      document.getElementById('result-total').textContent = `Total: ${total} / ${QUESTIONS.length * 7}`;
+
+      const badge = document.getElementById('result-badge');
+      badge.textContent = interp.label;
+      badge.className = 'score-badge ' + interp.badgeClass;
+
+      document.getElementById('result-desc').textContent = interp.desc;
+
+      showScreen('screen-results');
+      renderChart(mean);
+    }
+
+    // ─── BELL CURVE CHART ─────────────────────────────────────
+    function normalPDF(x, mean, sd) {
+      return (1 / (sd * Math.sqrt(2 * Math.PI))) *
+             Math.exp(-0.5 * Math.pow((x - mean) / sd, 2));
+    }
+
+    function generateCurve(mean, sd, numPoints = 200) {
+      const pts = [];
+      for (let i = 0; i <= numPoints; i++) {
+        const x = 1 + (i / numPoints) * 6; // 1.0 → 7.0
+        pts.push({ x, y: normalPDF(x, mean, sd) });
+      }
+      return pts;
+    }
+
+    function renderChart(patientMean) {
+      if (fssChart) { fssChart.destroy(); fssChart = null; }
+
+      const ctx = document.getElementById('fss-chart').getContext('2d');
+
+      const healthyCurve = generateCurve(3.00, 1.08);
+      const msCurve      = generateCurve(4.66, 1.64);
+
+      fssChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          datasets: [
+            {
+              label: 'Healthy Controls',
+              data: healthyCurve,
+              borderColor: '#009dff',
+              backgroundColor: 'rgba(0, 157, 255, 0.18)',
+              fill: true,
+              tension: 0.4,
+              pointRadius: 0,
+              borderWidth: 2.5,
+              order: 2
+            },
+            {
+              label: 'MS Patients',
+              data: msCurve,
+              borderColor: '#d01b9c',
+              backgroundColor: 'rgba(209, 27, 156, 0.15)',
+              fill: true,
+              tension: 0.4,
+              pointRadius: 0,
+              borderWidth: 2.5,
+              order: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          parsing: false,
+          interaction: { mode: 'none' },
+          animation: { duration: 600, easing: 'easeOutQuart' },
+          scales: {
+            x: {
+              type: 'linear',
+              min: 1,
+              max: 7,
+              ticks: {
+                stepSize: 1,
+                color: '#121b51',
+                font: { family: "'Noto Sans', sans-serif", size: 11, weight: '600' },
+                callback: v => v
+              },
+              title: {
+                display: true,
+                text: 'FSS Mean Score (1–7)',
+                color: 'rgba(18, 27, 81, 0.6)',
+                font: { family: "'Noto Sans', sans-serif", size: 11, weight: '600' }
+              },
+              grid: { color: 'rgba(18, 27, 81, 0.06)' },
+              border: { color: 'rgba(18, 27, 81, 0.15)' }
+            },
+            y: {
+              display: false,
+              min: 0
+            }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: { enabled: false },
+            annotation: {
+              annotations: {
+                clinicalThreshold: {
+                  type: 'line',
+                  xMin: 4.0,
+                  xMax: 4.0,
+                  borderColor: 'rgba(18, 27, 81, 0.25)',
+                  borderWidth: 1.5,
+                  borderDash: [6, 4],
+                  label: {
+                    display: true,
+                    content: 'Clinical Threshold',
+                    position: 'start',
+                    yAdjust: 8,
+                    backgroundColor: 'transparent',
+                    color: 'rgba(18, 27, 81, 0.4)',
+                    font: { family: "'Noto Sans', sans-serif", size: 9.5, weight: '600' },
+                    padding: 0
+                  }
+                },
+                patientScore: {
+                  type: 'line',
+                  xMin: patientMean,
+                  xMax: patientMean,
+                  borderColor: '#121b51',
+                  borderWidth: 2.5,
+                  label: {
+                    display: true,
+                    content: 'Your Score (' + patientMean.toFixed(1) + ')',
+                    position: 'end',
+                    yAdjust: -6,
+                    backgroundColor: '#121b51',
+                    color: '#ffffff',
+                    borderRadius: 6,
+                    font: { family: "'Noto Sans', sans-serif", size: 10, weight: '700' },
+                    padding: { x: 8, y: 4 }
+                  }
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // ─── GOOGLE SHEETS SUBMISSION ─────────────────────────────
+    async function sendToSheets(payload) {
+      if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL') return;
+      try {
+        await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+      } catch (e) {
+        // Silently fail — never block the user flow
+      }
+    }
+
+    async function submitAndContinue(contributed) {
+      const btn = document.getElementById('contribute-btn');
+      if (btn) btn.classList.add('btn-loading');
+
+      const payload = {
+        timestamp:      new Date().toISOString(),
+        score_mean:     currentMean  ? currentMean.toFixed(1)  : '',
+        score_total:    currentTotal ? currentTotal.toString()  : '',
+        interpretation: currentLabel || '',
+        contributed:    contributed ? 'Yes' : 'No',
+        initials:       contributed ? (document.getElementById('f-initials').value.trim() || '') : '',
+        sex:            contributed ? (document.getElementById('f-sex').value || '')             : '',
+        age:            contributed ? (document.getElementById('f-age').value || '')             : '',
+        diagnosis:      contributed ? (document.getElementById('f-diagnosis').value || '')       : ''
+      };
+
+      await sendToSheets(payload);
+      showScreen('screen-booking');
+    }
+  </script>
+
+</body>
+</html>
